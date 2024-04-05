@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model courses {
+  id                      Int                @id @default(autoincrement())
+  title                   String             @db.VarChar(255)
+  slug                    String             @db.VarChar(255)
+  descriptionContent      String
+  shortDescriptionContent String
+  onboardCategory         String
+  isNew                   Boolean
+  isHidden                Boolean
+  iconBanner              String
+  sections                sections_courses[]
+}
+
+model sections {
+  id          Int                @id @default(autoincrement())
+  index       Int
+  name        String             @db.VarChar(255)
+  description String
+  startIndex  Int
+  endIndex    Int
+  isLocked    Boolean
+  courses     sections_courses[]
+  tutorials   tutorials[]
+}
+
+model sections_courses {
+  sectionId Int
+  courseId  Int
+  course    courses  @relation(fields: [courseId], references: [id])
+  section   sections @relation(fields: [sectionId], references: [id])
+
+  @@id([sectionId, courseId])
+}
+
+model tutorials {
+  id                 Int      @id @default(autoincrement())
+  index              Int
+  codeLanguage       String
+  descriptionContent String
+  title              String   @db.VarChar(255)
+  type               String
+  bannerIconUrl      String?
+  isCompleted        Boolean
+  sectionId          Int
+  section            sections @relation(fields: [sectionId], references: [id])
+}
